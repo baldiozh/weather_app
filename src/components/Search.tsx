@@ -1,52 +1,22 @@
-import { useState, ChangeEvent, useEffect } from "react"
-import { optionType } from "../../types"
+import { ChangeEvent } from "react"
+import { optionType } from "../types"
 
-const App = (): JSX.Element => {
-	// http://api.openweathermap.org/geo/1.0/direct?q={city name},{state code},{country code}&limit={limit}&appid={API key}
-	const [term, setTerm] = useState<string>('')
-	const [options, setOptions] = useState<[]>([])
-	const [city, setCity] = useState<optionType | null>(null)
+type Props = {
+	term: string
+	options: []
+	onInputChange: (e: ChangeEvent<HTMLInputElement>) => void
+	onOptionSelect: (option: optionType) => void
+	onSubmit: () => void
+}
 
-	const getSearchOptions = (value: string) =>{
-		fetch(`http://api.openweathermap.org/geo/1.0/direct?q=${value.trim()},
-			&limit=5&appid=${process.env.REACT_APP_API_KEY}`)
-		.then((res) => res.json())
-		.then((data) => setOptions(data))
+const Search = ({
+	term, 
+	options, 
+	onInputChange, 
+	onOptionSelect, 
+	onSubmit,
+}: Props): JSX.Element => {
 	
-	}
-	const onInputChange = (e: ChangeEvent<HTMLInputElement>) => {
-		const value = e.target.value.trim()
-		setTerm(e.target.value)
-		// console.log(term)
-		if (value === '') return 
-		getSearchOptions(value)
-	}
-
-	const getForecast = (city: optionType,) => {
-		fetch(`https://api.openweathermap.org/data/2.5/weather?
-		lat=${city.lat}&lon=${city.lon}&units=metric
-		&appid=${process.env.REACT_APP_API_KEY}`)
-		.then(res => res.json())
-		.then(data => console.log({data}))
-	}
-	const onSubmit = () => {
-		if (!city) return
-		getForecast(city)
-	}
-
-	const onOptionSelect = (option: optionType) => {
-		setCity(option)
-
-		// console.log(option.name)
-	}
-
-	useEffect(() => {
-		if(city){
-			setTerm(city.name)
-			setOptions([])
-		}
-	}, [city])
-
 	return (
 	<main className="flex justify-center items-center h-[100vh] w-full"> 
 	{/* bg-gradient-to-br from-sky-300 via-rose-300 to-lime-300 */}
@@ -91,4 +61,4 @@ const App = (): JSX.Element => {
   )
 }
 
-export default App
+export default Search
